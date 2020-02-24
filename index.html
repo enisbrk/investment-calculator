@@ -1,0 +1,84 @@
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	</head>
+	<body>
+		<div id="app">
+			<label for="current_rate">Current Rate</label> <input type="text" v-model="current_rate"><br><br>
+			<div class="procurement" v-for="procurement in procurements">
+				<input type="text" v-model="procurement.rate">
+				<input type="number" v-model="procurement.quantity">
+				<label>Purchase Amount: {{ formatNumber(procurement.rate * procurement.quantity) }}</label>
+				<label>Current Amount: {{ formatNumber(current_rate * procurement.quantity) }}</label>
+				<label>Benefits/Losses: {{ formatNumber((current_rate - procurement.rate) * procurement.quantity) }}</label>
+			</div>
+			<div>Total Benefits/Losses: {{ formatNumber(totalBenefit) }}</div>
+			<div>Current Total: {{ formatNumber(totalBenefit) }}</div>
+			<button v-on:click="addRow">Add Row</button>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+var app = new Vue({
+	el: '#app',
+	data: {
+		current_rate: 301,
+		procurements: [
+			{
+				"quantity": 1,
+				"rate": 301,
+			}
+		]
+	},
+	computed: {
+		totalBenefit: function () {
+			let current_rate = this.current_rate;
+			return this.procurements.reduce(function(partial_sum,item){
+		    	return partial_sum + ((current_rate - item.rate) * item.quantity)
+		  	}, 0);
+		},
+		totalAmount: function () {
+			let current_rate = this.current_rate;
+			return this.procurements.reduce(function(partial_sum,item){
+		    	return partial_sum + (current_rate * item.quantity)
+		  	}, 0);
+		}
+	},
+	methods: {
+		// currentRate: function () {
+		// 	fetch('https://altin.in/seninbankan.json?z=24.02.2020+13:16:27', {
+		// 		method: 'GET', // or 'PUT'
+		// 		mode: 'cors',
+		// 		credentials: 'same-origin',
+		// 		referrerPolicy: 'no-referrer',
+		// 		headers: {
+		// 			'Access-Control-Allow-Origin': 'https://meetinghand.com',
+		// 			'Access-Control-Allow-Credentials': 'true',
+		// 			'Content-Type': 'application/json',
+		// 			'Rererer': 'https://altin.in'
+		// 		}
+		// 	})
+		// 	.then((data) => {
+		// 	  console.log('Success:', data);
+		// 	})
+		// },
+		addRow: function () {
+			this.procurements.push({
+				'quantity': 1,
+				"rate": this.current_rate
+			})
+		},
+		formatNumber: function (value) {
+		  	return '₺' + value.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+		}
+	},
+	created() {
+		// this.currentRate();
+	}
+})
+</script>
+<style>
+	.procurement {
+		margin-bottom: 10px;
+	}
+</style>
