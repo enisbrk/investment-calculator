@@ -5,12 +5,13 @@
 	<body>
 		<div id="app">
 			<label for="current_rate">Current Rate</label> <input type="text" v-model="current_rate"><br><br>
-			<div class="procurement" v-for="procurement in procurements">
+			<div class="procurement" v-for="(procurement, index) in procurements">
 				<input type="text" v-model="procurement.rate">
 				<input type="number" v-model="procurement.quantity">
 				<label>Purchase Amount: {{ formatNumber(procurement.rate * procurement.quantity) }}</label>
 				<label>Current Amount: {{ formatNumber(current_rate * procurement.quantity) }}</label>
 				<label>Benefits/Losses: {{ formatNumber((current_rate - procurement.rate) * procurement.quantity) }}</label>
+				<button v-on:click="removeRow(index)">Remove Row</button>
 			</div>
 			<div>Total Benefits/Losses: {{ formatNumber(totalBenefit) }}</div>
 			<div>Current Total: {{ formatNumber(totalBenefit) }}</div>
@@ -53,6 +54,9 @@ var app = new Vue({
 				'quantity': 1,
 				"rate": this.current_rate
 			})
+		},
+		removeRow: function (index) {
+			this.procurements.splice(index, 1)
 		},
 		formatNumber: function (value) {
 		  	return '₺' + value.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
