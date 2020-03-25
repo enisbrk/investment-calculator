@@ -79,8 +79,9 @@
 					   	</div>
 					</div>
 					<div class="procurement">
+						<div>Input Amount: <strong>{{ formatNumber(totalInputAmount) }}</strong></div>
+						<div>Current Amount: <strong>{{ formatNumber(totalCurrentAmount) }}</strong></div>
 						<div>Total Benefits/Losses: <strong>{{ formatNumber(totalBenefit) }}</strong></div>
-						<div>Current Total: <strong>{{ formatNumber(totalBenefit) }}</strong></div>
 					</div>
 		        </div>
 		    </div>
@@ -95,16 +96,21 @@ var app = new Vue({
 		procurements: []
 	},
 	computed: {
+		totalInputAmount: function () {
+			return this.procurements.reduce(function(partial_sum,item){
+		    	return partial_sum + (item.rate * item.quantity)
+		  	}, 0);
+		},
+		totalCurrentAmount: function () {
+			let current_rate = this.current_rate;
+			return this.procurements.reduce(function(partial_sum,item){
+		    	return partial_sum + (current_rate * item.quantity)
+		  	}, 0);
+		},
 		totalBenefit: function () {
 			let current_rate = this.current_rate;
 			return this.procurements.reduce(function(partial_sum,item){
 		    	return partial_sum + ((current_rate - item.rate) * item.quantity)
-		  	}, 0);
-		},
-		totalAmount: function () {
-			let current_rate = this.current_rate;
-			return this.procurements.reduce(function(partial_sum,item){
-		    	return partial_sum + (current_rate * item.quantity)
 		  	}, 0);
 		}
 	},
@@ -149,7 +155,13 @@ var app = new Vue({
 	},
 	watch: {
 		current_rate: function (val) {
-			localStorage.setItem('current_rate', val);
+			localStorage.setItem('current_rate', val)
+		},
+		procurements: {
+			handler: function (val, oldVal) {
+				this.saveProcurements()
+			},
+			deep: true
 		}
 	},
 	created() {
