@@ -78,7 +78,7 @@
 var app = new Vue({
 	el: '#app',
 	data: {
-		current_rate: 301,
+		current_rate: 0,
 		procurements: []
 	},
 	computed: {
@@ -120,13 +120,25 @@ var app = new Vue({
 	},
 	mounted() {
 	    if (localStorage.getItem('procurements')) {
-	      try {
-	        this.procurements = JSON.parse(localStorage.getItem('procurements'));
-	      } catch(e) {
-	        localStorage.removeItem('procurements');
-	      }
+	      	try {
+	        	this.procurements = JSON.parse(localStorage.getItem('procurements'));
+	      	} catch(e) {
+	        	localStorage.removeItem('procurements');
+	      	}
 	    }
-	  },
+		if (localStorage.getItem('current_rate')) {
+	      	try {
+	        	this.current_rate = localStorage.getItem('current_rate');
+	      	} catch(e) {
+	        	localStorage.removeItem('current_rate');
+	      	}
+	    }
+	},
+	watch: {
+		current_rate: function (val) {
+			localStorage.setItem('current_rate', val);
+		}
+	},
 	created() {
 		// this.currentRate();
 	}
