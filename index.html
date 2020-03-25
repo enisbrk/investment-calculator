@@ -1,21 +1,76 @@
+<!--
+@author [Enis Burak Demirci]
+@email [enisbrk@gmail.com]
+@create date 2020-02-24 13:06:26
+@desc [investment calculator]
+-->
 <html>
 	<head>
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 		<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 	</head>
 	<body>
-		<div id="app">
-			<label for="current_rate">Current Rate</label> <input type="text" v-model="current_rate"><br><br>
-			<div class="procurement" v-for="(procurement, index) in procurements">
-				<input type="text" v-model="procurement.rate">
-				<input type="number" v-model="procurement.quantity">
-				<label>Purchase Amount: {{ formatNumber(procurement.rate * procurement.quantity) }}</label>
-				<label>Current Amount: {{ formatNumber(current_rate * procurement.quantity) }}</label>
-				<label>Benefits/Losses: {{ formatNumber((current_rate - procurement.rate) * procurement.quantity) }}</label>
-				<button v-on:click="removeRow(index)">Remove Row</button>
-			</div>
-			<div>Total Benefits/Losses: {{ formatNumber(totalBenefit) }}</div>
-			<div>Current Total: {{ formatNumber(totalBenefit) }}</div>
-			<button v-on:click="addRow">Add Row</button>
+		<div class="container h-100" id="app">
+			<div class="row align-items-center h-100">
+		        <div class="col-8 mx-auto">
+		        	<h1 class="mb-4">Investment Calculator</h1>
+
+		        	<div class="d-inline-flex align-items-center">
+			            <div class="input-group mb-3">
+						  <div class="input-group-prepend">
+						    <span class="input-group-text">Current Rate</span>
+						  </div>
+						  <input type="text" class="form-control" v-model="current_rate">
+						</div>
+					</div>
+		            <div class="row mb-1 font-weight-bold">
+						<div class="col-2 py-1 bg-light">
+							Rate
+					   	</div>
+					   	<div class="col-2 py-1 bg-light">
+							Qty
+					   	</div>
+					   	<div class="col-2 py-1 bg-light">
+							Purchase A.
+					   	</div>
+					   	<div class="col-2 py-1 bg-light">
+							Current A.
+					   	</div>
+					   	<div class="col-3 py-1 bg-light">
+							Benefits/Losses
+					   	</div>
+					</div>
+					<div class="row mb-1" v-for="(procurement, index) in procurements">
+						<div class="col-2 py-1 bg-light">
+							<input type="text" class="form-control" v-model="procurement.rate">
+					   	</div>
+					   	<div class="col-2 py-1 bg-light">
+							<input type="number" class="form-control" v-model="procurement.quantity">
+					   	</div>
+					   	<div class="col-2 py-1 bg-light">
+							<span class="align-middle">{{ formatNumber(procurement.rate * procurement.quantity) }}</span>
+					   	</div>
+					   	<div class="col-2 py-1 bg-light">
+							{{ formatNumber(current_rate * procurement.quantity) }}
+					   	</div>
+					   	<div class="col-3 py-1 bg-light">
+							{{ formatNumber((current_rate - procurement.rate) * procurement.quantity) }}
+					   	</div>
+					   	<div class="col-1 py-1">
+							<button v-on:click="removeRow(index)" class="btn btn-danger btn-sm">Del</button>
+					   	</div>
+					</div>
+					<div class="row mb-3 font-weight-bold">
+					   	<div class="col-1 offset-11 py-1">
+					   		<button v-on:click="addRow" class="btn btn-primary btn-sm">Add</button>
+					   	</div>
+					</div>
+					<div class="procurement">
+						<div>Total Benefits/Losses: <strong>{{ formatNumber(totalBenefit) }}</strong></div>
+						<div>Current Total: <strong>{{ formatNumber(totalBenefit) }}</strong></div>
+					</div>
+		        </div>
+		    </div>
 		</div>
 	</body>
 </html>
@@ -24,12 +79,7 @@ var app = new Vue({
 	el: '#app',
 	data: {
 		current_rate: 301,
-		procurements: [
-			{
-				"quantity": 1,
-				"rate": 301,
-			}
-		]
+		procurements: []
 	},
 	computed: {
 		totalBenefit: function () {
@@ -54,14 +104,29 @@ var app = new Vue({
 				'quantity': 1,
 				"rate": this.current_rate
 			})
+			this.saveProcurements()
 		},
 		removeRow: function (index) {
 			this.procurements.splice(index, 1)
+			this.saveProcurements()
 		},
+		saveProcurements() {
+	      const parsed = JSON.stringify(this.procurements);
+	      localStorage.setItem('procurements', parsed);
+	    },
 		formatNumber: function (value) {
 		  	return '₺' + value.toFixed(2).replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 		}
 	},
+	mounted() {
+	    if (localStorage.getItem('procurements')) {
+	      try {
+	        this.procurements = JSON.parse(localStorage.getItem('procurements'));
+	      } catch(e) {
+	        localStorage.removeItem('procurements');
+	      }
+	    }
+	  },
 	created() {
 		// this.currentRate();
 	}
