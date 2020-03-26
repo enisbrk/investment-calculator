@@ -1,0 +1,10 @@
+<!-- favicon.svg -->
+<svg xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text {
+      fill: transparent;
+      text-shadow: 0 0 0 white;
+    }
+  </style>
+  <text y="32" font-size="32">💰</text>
+</svg>
